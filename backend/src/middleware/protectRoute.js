@@ -3,7 +3,7 @@ import User from "../models/User.js";
 import { upsertStreamUser } from "../lib/stream.js";
 
 export const protectRoute = [
-  requireAuth({ signInUrl: null }), // Disable redirect, return 401 for API routes
+  requireAuth({ signInUrl: null, unauthenticatedRedirect: null }), // Disable all redirects for API routes
   async (req, res, next) => {
     try {
       const clerkId = req.auth().userId;

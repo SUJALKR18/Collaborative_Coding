@@ -30,6 +30,10 @@ app.get("/", (req, res) => {
   res.status(200).json({ msg: "Talent-IQ API is running", status: "ok" });
 });
 
+app.get("/api", (req, res) => {
+  res.status(200).json({ msg: "Talent-IQ API is running", status: "ok" });
+});
+
 app.get("/health", (req, res) => {
   res.status(200).json({ msg: "api is up and running" });
 });
@@ -43,6 +47,19 @@ if (ENV.NODE_ENV === "production") {
   });
 }
 
+// Database connection state for serverless
+let isConnected = false;
+
+// Serverless handler for Vercel
+const handler = async (req, res) => {
+  if (!isConnected) {
+    await connectDB();
+    isConnected = true;
+  }
+  return app(req, res);
+};
+
+// Start server for local development
 const startServer = async () => {
   try {
     await connectDB();
@@ -54,4 +71,11 @@ const startServer = async () => {
   }
 };
 
-startServer();
+// Only start the server if not in Vercel serverless environment
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+// Export for Vercel serverless
+export default handler;
+
