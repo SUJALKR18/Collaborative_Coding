@@ -52,11 +52,19 @@ let isConnected = false;
 
 // Serverless handler for Vercel
 const handler = async (req, res) => {
-  if (!isConnected) {
-    await connectDB();
-    isConnected = true;
+  try {
+    if (!isConnected) {
+      await connectDB();
+      isConnected = true;
+    }
+    return app(req, res);
+  } catch (error) {
+    console.error("Serverless handler error:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined
+    });
   }
-  return app(req, res);
 };
 
 // Start server for local development
